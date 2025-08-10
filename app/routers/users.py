@@ -4,9 +4,9 @@ from sqlmodel import Session, select
 from ..database import get_session
 from ..models import User, UserCreate, UserProfile, UserLogin
 from ..auth import hash_password, verify_password, create_access_token, decode_token
+from ..dependencies import login_for_access_token, get_current_user
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
 
 @router.post("/register")
@@ -38,28 +38,15 @@ def login(user: UserLogin, session: Session = Depends(get_session)):
 
 
 @router.post("/token")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
-
-    user = session.exec(select(User).where(User.username == form_data.username)).first()
-
-    if not user or not verify_password(form_data.password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    
-    access_token = create_access_token({"sub": str(user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+def token_route(token_data=Depends(login_for_access_token)):
+    return token_data
 
 
 @router.get("/profile", response_model=UserProfile)
-def profile(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
-
-    payload = decode_token(token)
-
-    if not payload:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    
-    user = session.get(User, int(payload.get("sub")))
-    
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return UserProfile(user_id=user.id, username=user.username, email=user.email, created_at=user.created_at)
+def profile(current_user: User = Depends(get_current_user)):
+    return UserProfile(
+        user_id=current_user.id,
+        username=current_user.username,
+        email=current_user.email,
+        created_at=current_user.created_at
+    )
