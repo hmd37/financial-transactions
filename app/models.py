@@ -1,62 +1,34 @@
-from sqlmodel import SQLModel, Field
 from datetime import datetime
-from typing import Optional
-from pydantic import EmailStr
+from typing import Optional, List
+from sqlmodel import SQLModel, Field, Relationship
+from enum import Enum
 
+class TransactionType(str, Enum):
+    DEPOSIT = "deposit"
+    WITHDRAWAL = "withdrawal"
+    TRANSFER = "transfer"
+
+class Currency(str, Enum):
+    USD = "USD"
+    EUR = "EUR"
+    GBP = "GBP"
 
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    username: str
-    email: EmailStr
-    password: str  # hashed
+    username: str = Field(unique=True, index=True)
+    email: str = Field(unique=True, index=True)
+    password: str
     created_at: datetime = Field(default_factory=datetime.now)
-
-class UserCreate(SQLModel):
-    username: str
-    email: EmailStr
-    password: str
-
-class UserLogin(SQLModel):
-    email: EmailStr
-    password: str
-
-class UserProfile(SQLModel):
-    user_id: int
-    username: str
-    email: EmailStr
-    created_at: datetime
-
-
-from sqlmodel import SQLModel, Field
-from typing import Optional
-from datetime import datetime, timezone
-
-# Existing user models here...
+    
+    transactions: List["Transaction"] = Relationship(back_populates="user")
 
 class Transaction(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int
     amount: float
-    currency: str
-    transaction_type: str
+    currency: Currency
+    transaction_type: TransactionType
     recipient_id: Optional[int] = None
     timestamp: datetime = Field(default_factory=datetime.now)
-
-class TransactionCreate(SQLModel):
-    amount: float
-    currency: str
-    transaction_type: str
-    recipient_id: Optional[int] = None
-
-class TransactionRead(SQLModel):
-    transaction_id: int
-    amount: float
-    currency: str
-    transaction_type: str
-    recipient_id: Optional[int]
-    timestamp: datetime
-
-class BalanceResponse(SQLModel):
-    user_id: int
-    balance: float
-    currency: str
+    
+    user_id: int = Field(foreign_key="user.id")
+    user: Optional[User] = Relationship(back_populates="transactions")

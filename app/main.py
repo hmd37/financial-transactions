@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from .database import init_db
 from .routers import users, transactions
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()

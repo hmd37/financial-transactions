@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from ..database import get_session
-from ..models import User, UserCreate, UserProfile, UserLogin
+from ..models import User
+from ..schemas import UserCreate, UserProfile, UserLogin
 from ..auth import hash_password, verify_password, create_access_token, decode_token
 from ..dependencies import login_for_access_token, get_current_user
 
@@ -14,6 +15,8 @@ def register(user: UserCreate, session: Session = Depends(get_session)):
 
     if session.exec(select(User).where(User.email == user.email)).first():
         raise HTTPException(status_code=400, detail="Email already registered")
+    if session.exec(select(User).where(User.username == user.username)).first():
+        raise HTTPException(status_code=400, detail="Username already registered")
     
     hashed_pw = hash_password(user.password)
     new_user = User(username=user.username, email=user.email, password=hashed_pw)
