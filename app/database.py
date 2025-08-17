@@ -1,7 +1,7 @@
 from sqlmodel import Session, create_engine
 
-DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+DATABASE_URL = "postgresql+psycopg2://postgres:12345@localhost:5432/finance"
+engine = create_engine(DATABASE_URL, echo=True)
 
 
 def get_session():
