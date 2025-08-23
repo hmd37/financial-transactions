@@ -1,0 +1,32 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Lock files
+uv.lock
+
+# Local database
+test.db
+
+# Project configs not needed inside container
+pyproject.toml
+
+# Git stuff
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
+
+# Editor/IDE files
+*.log
+.vscode/
+.idea/
+README.md

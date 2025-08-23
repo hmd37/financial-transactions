@@ -1,0 +1,17 @@
+services:
+  app:
+      build: .
+      container_name: fastapi_app
+      depends_on:
+        - db
+      ports:
+        - "8000:8000"
+  db:
+    image: postgres:17.6-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "12345"
+      POSTGRES_DB: finance
+    ports:
+      - "5432:5432"
