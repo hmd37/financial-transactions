@@ -1,10 +1,14 @@
+import os
 from datetime import datetime, timedelta
 
 import bcrypt
 import jwt
+from dotenv import load_dotenv
 
-SECRET_KEY = "your_secret_key"  # Change this for production
-ALGORITHM = "HS256"
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 

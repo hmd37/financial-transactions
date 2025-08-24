@@ -1,6 +1,11 @@
+import os
+
+from dotenv import load_dotenv
 from sqlmodel import Session, create_engine
 
-DATABASE_URL = "postgresql+psycopg2://postgres:12345@db:5432/finance"
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DATABASE_URL, echo=True)
 
 

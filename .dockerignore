@@ -30,3 +30,5 @@ docker-compose.yml
 .vscode/
 .idea/
 README.md
+.env
+.dockerignore
